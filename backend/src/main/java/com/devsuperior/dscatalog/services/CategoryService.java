@@ -3,11 +3,13 @@ package com.devsuperior.dscatalog.services;
 import com.devsuperior.dscatalog.dto.CategoryDTO;
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
+import com.devsuperior.dscatalog.services.exceptions.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,9 +24,9 @@ public class CategoryService {
         return categoryList.stream().map(cat -> new CategoryDTO(cat )).collect(Collectors.toList());
     }
 
-    public Category findOne(Long id){
-        Category category = categoryRepository.findById(id).get();
-        return category;
+    public CategoryDTO findOne(Long id){
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+        return new CategoryDTO(category);
     }
 
     public void save(String name){

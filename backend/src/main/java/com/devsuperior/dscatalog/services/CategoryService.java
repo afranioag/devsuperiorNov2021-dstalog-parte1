@@ -3,14 +3,13 @@ package com.devsuperior.dscatalog.services;
 import com.devsuperior.dscatalog.dto.CategoryDTO;
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
-import com.devsuperior.dscatalog.services.exceptions.EntityNotFoundException;
+import com.devsuperior.dscatalog.services.exceptions.ResourceEntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +27,7 @@ public class CategoryService {
 
     @Transactional(readOnly = false)
     public CategoryDTO findOne(Long id){
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceEntityNotFoundException("Entity not found"));
         return new CategoryDTO(category);
     }
 
@@ -42,17 +41,25 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDTO update(CategoryDTO categoryDTO){
-        Category category = categoryRepository.findById(categoryDTO.getId()).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
-        category.setName(categoryDTO.getName());
-        category = categoryRepository.save(category);
-        return new CategoryDTO(category);
+    public CategoryDTO update(Long id, CategoryDTO categoryDTO){
+
+        try {
+            Category category = categoryRepository.getOne(id);
+            category.setName(categoryDTO.getName());
+            category = categoryRepository.save(category);
+            return new CategoryDTO(category);
+        }catch (EntityNotFoundException e){
+            throw new ResourceEntityNotFoundException("Entity not found");
+        }
     }
 
+    @Transactional
     public void delete(Long id){
-
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity not found"));
-        categoryRepository.deleteById(id);
+        try {
+            categoryRepository.deleteById(id);
+        }catch (EntityNotFoundException e){
+            throw new ResourceEntityNotFoundException("Entity not found");
+        }
     }
 
 }

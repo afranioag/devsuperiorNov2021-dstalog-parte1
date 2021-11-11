@@ -48,6 +48,6 @@ public class CategoryResource {
     @DeleteMapping(value = {"/{id}"})
     public ResponseEntity delete(@PathVariable Long id){
         categoryService.delete(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

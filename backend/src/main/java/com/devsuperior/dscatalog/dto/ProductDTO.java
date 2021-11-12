@@ -42,7 +42,7 @@ public class ProductDTO  implements Serializable {
         this(product);
         categories.forEach(cat -> this.categories.add(new CategoryDTO(cat)));
     }
-    
+
     public ProductDTO() {
     }
 
